@@ -15,164 +15,171 @@ set -e
 
 BIN=/usr/local/bin
 
-get_os() {
-    local unameOut="$(uname -s)"
-    case "${unameOut}" in
-        Linux*)     OS=linux;;
-        Darwin*)    OS=macos;;
-        *)          OS="UNKNOWN:${unameOut}" # @todo test this on WSL2; does it report differently than Linux?
-    esac
-}
+define_helpers() {
+    # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L52
+    command_exists() {
+        command -v "$@" >/dev/null 2>&1
+    }
 
-# https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L52
-command_exists() {
-    command -v "$@" >/dev/null 2>&1
-}
+    # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L60
+    underline() {
+        echo "$(printf '\033[4m')$@$(printf '\033[24m')"
+    }
 
-# https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L60
-underline() {
-	echo "$(printf '\033[4m')$@$(printf '\033[24m')"
-}
-
-# https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L52
-setup_color() {
-	# Only use colors if connected to a terminal
-	if [ -t 1 ]; then
-		RED=$(printf '\033[31m')
-		GREEN=$(printf '\033[32m')
-		YELLOW=$(printf '\033[33m')
-		BLUE=$(printf '\033[34m')
-		BOLD=$(printf '\033[1m')
-		RESET=$(printf '\033[m')
-	else
-		RED=""
-		GREEN=""
-		YELLOW=""
-		BLUE=""
-		BOLD=""
-		RESET=""
-	fi
-}
-
-title() {
-    local TITLE=$@
-    echo ""
-    echo "${GREEN}${TITLE}${RESET}"
-    echo "============================================================"
-}
-
-setup_php() {
-    title "Install PHP"
-
-    if command_exists php; then
-        echo "We'll rely on your built-in PHP for now."
-    else
-        echo "Sorry, only programmed for built-in PHP so far."
-        exit
-    fi
-}
-
-# https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
-setup_composer() {
-    title "Install Composer"
-
-    if command_exists composer; then
-        echo "Composer already installed; skipping."
-    else
-        echo "Downloading Composer..."
-        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-
-        if command_exists curl; then
-            echo "Checking validity of the downloaded file..."
-
-            local EXPECTED_CHECKSUM="$(curl -fsSL https://composer.github.io/installer.sig)"
-            local ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', 'composer-setup.php');")"
-
-            if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]
-            then
-                >&2 echo 'ERROR: Invalid installer checksum from Composer'
-                rm composer-setup.php
-                exit 1
-            fi
+    # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L52
+    setup_color() {
+        # Only use colors if connected to a terminal
+        if [ -t 1 ]; then
+            RED=$(printf '\033[31m')
+            GREEN=$(printf '\033[32m')
+            YELLOW=$(printf '\033[33m')
+            BLUE=$(printf '\033[34m')
+            BOLD=$(printf '\033[1m')
+            RESET=$(printf '\033[m')
         else
-            echo "Can't check Composer's signature because your machine doesn't have curl."
+            RED=""
+            GREEN=""
+            YELLOW=""
+            BLUE=""
+            BOLD=""
+            RESET=""
         fi
+    }
 
-        echo "Running Composer setup script..."
-        php composer-setup.php --quiet
-        RESULT=$?
-        rm composer-setup.php
+    title() {
+        local TITLE=$@
+        echo ""
+        echo "${GREEN}${TITLE}${RESET}"
+        echo "============================================================"
+    }
 
-        local TARGET_PATH="$BIN/composer"
-        mv composer.phar $TARGET_PATH
+    composer_has_package() {
+        composer global show 2>/dev/null | grep "$@" >/dev/null
+    }
 
-        if [ $RESULT ]; then
-            echo "Composer installed!"
+    composer_require() {
+        if composer_has_package "$@"; then
+            echo "$@ already installed; skipping."
         else
-            echo "Error installing Composer."
+            echo "Installing $@..."
+            composer global require "$@" --quiet
+            echo "$@ installed!"
+        fi
+    }
+}
+
+define_steps() {
+    get_os() {
+        local unameOut="$(uname -s)"
+        case "${unameOut}" in
+            Linux*)     OS=linux;;
+            Darwin*)    OS=macos;;
+            *)          OS="UNKNOWN:${unameOut}" # @todo test this on WSL2; does it report differently than Linux?
+        esac
+    }
+
+    install_php() {
+        title "Install PHP"
+
+        if command_exists php; then
+            echo "We'll rely on your built-in PHP for now."
+        else
+            echo "Sorry, only programmed for built-in PHP so far."
             exit
         fi
-    fi
-}
+    }
 
-composer_has_package() {
-    composer global show 2>/dev/null | grep "$@" >/dev/null
-}
+    # https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
+    install_composer() {
+        title "install_laravel_installer Composer"
 
-composer_require() {
-    if composer_has_package "$@"; then
-        echo "$@ already installed; skipping."
-    else
-        echo "Installing $@..."
-        composer global require "$@" --quiet
-        echo "$@ installed!"
-    fi
-}
+        if command_exists composer; then
+            echo "Composer already installed; skipping."
+        else
+            echo "Downloading Composer..."
+            php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 
-setup_laravel_installer() {
-    title "Install the Laravel Installer"
-    composer_require laravel/installer
-}
+            if command_exists curl; then
+                echo "Checking validity of the downloaded file..."
 
-setup_takeout() {
-    title "Install Takeout"
-    composer_require tightenco/takeout
-}
+                local EXPECTED_CHECKSUM="$(curl -fsSL https://composer.github.io/installer.sig)"
+                local ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', 'composer-setup.php');")"
 
-instructions() {
-    echo ""
-    echo "In order for Takeout to work, you'll want to set up Docker."
-    echo "Here are instructions for your system:"
-    echo ""
-    underline "https://takeout.tighten.co/install/$OS"
-    echo ""
-}
+                if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]
+                then
+                    >&2 echo 'ERROR: Invalid installer checksum from Composer'
+                    rm composer-setup.php
+                    exit 1
+                fi
+            else
+                echo "Can't check Composer's signature because your machine doesn't have curl."
+            fi
 
-logo() {
-    echo ""
-    printf "$BLUE"
-    cat <<-'EOF'
+            echo "Running Composer setup script..."
+            php composer-setup.php --quiet
+            RESULT=$?
+            rm composer-setup.php
 
-d888888b d8b   db d888888b d888888b 
-  `88'   888o  88   `88'   `~~88~~' 
-   88    88V8o 88    88       88    
-   88    88 V8o88    88       88    
-  .88.   88  V888   .88.      88    
-Y888888P VP   V8P Y888888P    YP    
+            local TARGET_PATH="$BIN/composer"
+            mv composer.phar $TARGET_PATH
 
-    ... has set you up for Laravel!
+            if [ $RESULT ]; then
+                echo "Composer installed!"
+            else
+                echo "Error installing Composer."
+                exit
+            fi
+        fi
+    }
+
+    install_laravel_installer() {
+        title "Install the Laravel Installer"
+        composer_require laravel/installer
+    }
+
+    install_takeout() {
+        title "Install Takeout"
+        composer_require tightenco/takeout
+    }
+
+    logo() {
+        echo ""
+        printf "$BLUE"
+        cat <<-'EOF'
+
+    d888888b d8b   db d888888b d888888b 
+      `88'   888o  88   `88'   `~~88~~' 
+       88    88V8o 88    88       88    
+       88    88 V8o88    88       88    
+      .88.   88  V888   .88.      88    
+    Y888888P VP   V8P Y888888P    YP    
+
+        ... has set you up for Laravel!
 EOF
-    printf "$RESET"
+        printf "$RESET"
+    }
+
+    instructions() {
+        echo ""
+        echo "In order for Takeout to work, you'll want to set up Docker."
+        echo "Here are instructions for your system:"
+        echo ""
+        underline "https://takeout.tighten.co/install/$OS"
+        echo ""
+    }
 }
 
 main() {
+    define_helpers
+    define_steps
+
     get_os
     setup_color
 
-    setup_php
-    setup_composer
-    setup_laravel_installer
-    setup_takeout
+    install_php
+    install_composer
+    install_laravel_installer
+    install_takeout
 
     logo
     instructions
