@@ -23,7 +23,44 @@ command_exists() {
 	command -v "$@" >/dev/null 2>&1
 }
 
+composer_required() {
+    # @todo Can we check this?
+}
+
+setup_color() {
+    # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L64
+	# Only use colors if connected to a terminal
+	if [ -t 1 ]; then
+		RED=$(printf '\033[31m')
+		GREEN=$(printf '\033[32m')
+		YELLOW=$(printf '\033[33m')
+		BLUE=$(printf '\033[34m')
+		BOLD=$(printf '\033[1m')
+		RESET=$(printf '\033[m')
+	else
+		RED=""
+		GREEN=""
+		YELLOW=""
+		BLUE=""
+		BOLD=""
+		RESET=""
+	fi
+}
+
+title() {
+    local TITLE=$@
+    echo ""
+    echo "${BLUE}${TITLE}${RESET}"
+    local LEN=${#TITLE}
+    local CH='#'
+    printf '%*s' "$LEN" | tr ' ' "$CH"
+    echo ""
+    echo ""
+}
+
 setup_php() {
+    title "Installing PHP..."
+
     if command_exists php; then
         echo "We'll rely on your built-in PHP for now."
     else
@@ -34,6 +71,8 @@ setup_php() {
 
 # https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
 setup_composer() {
+    title "Installing Composer..."
+
     if command_exists composer; then
         echo "Composer already installed; skipping."
     else
@@ -58,15 +97,21 @@ setup_composer() {
         RESULT=$?
         rm composer-setup.php
 
+        local TARGET_PATH="$BIN/composer"
+        mv composer.phar $TARGET_PATH
+        echo "MOVED TO $TARGET_PATH"
+
         echo "Composer installed!" # todo check RESULT
     fi
 }
 
 setup_laravel_installer() {
+    title "Installing the Laravel Installer..."
     composer global require laravel/installer
 }
 
 setup_takeout() {
+    title "Installing Takeout..."
     composer global require tightenco/takeout
 
     echo "In order for Takeout to work, you'll want to set up Docker."
@@ -76,6 +121,8 @@ setup_takeout() {
 
 main() {
     get_os
+
+    setup_color
 
     setup_php
     setup_composer
