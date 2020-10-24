@@ -84,10 +84,13 @@ setup_composer() {
     if command_exists composer; then
         echo "Composer already installed; skipping."
     else
+        echo "Downloading Composer..."
         php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 
-        if command_exists wget; then
-            local EXPECTED_CHECKSUM="$(wget -q -O - https://composer.github.io/installer.sig)"
+        if command_exists curl; then
+            echo "Checking validity of the downloaded file..."
+
+            local EXPECTED_CHECKSUM="$(curl -fsSL https://composer.github.io/installer.sig)"
             local ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', 'composer-setup.php');")"
 
             if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]
@@ -97,19 +100,23 @@ setup_composer() {
                 exit 1
             fi
         else
-            echo "Can't check Composer's signature because your machine doesn't have wget."
-            echo "@todo allow them to opt out? Or build a version using curl?"
+            echo "Can't check Composer's signature because your machine doesn't have curl."
         fi
 
+        echo "Running Composer setup script..."
         php composer-setup.php --quiet
         RESULT=$?
         rm composer-setup.php
 
         local TARGET_PATH="$BIN/composer"
         mv composer.phar $TARGET_PATH
-        echo "MOVED TO $TARGET_PATH"
 
-        echo "Composer installed!" # todo check RESULT
+        if [ $RESULT ]; then
+            echo "Composer installed!"
+        else
+            echo "Error installing Composer."
+            exit
+        fi
     fi
 }
 
@@ -119,7 +126,7 @@ composer_has_package() {
 
 composer_require() {
     if composer_has_package "$@"; then
-        echo "$@ already installed!"
+        echo "$@ already installed; skipping."
     else
         echo "Installing $@..."
         composer global require "$@"
@@ -156,7 +163,7 @@ main() {
     setup_takeout
 
     echo ""
-    echo "============================================================"
+    echo ""
     echo ""
     printf "$BLUE"
 	cat <<-'EOF'
@@ -167,7 +174,7 @@ main() {
 \ \ \L\ \/\ \L\.\_/\ \L\ \/\ \L\ \ \_\ \_/\  __//\__, `\
  \ \ ,__/\ \__/.\_\ \___,_\ \___,_\/\____\ \____\/\____/
   \ \ \/  \/__/\/_/\/__,_ /\/__,_ /\/____/\/____/\/___/
-   \ \_\  is now installed!
+   \ \_\  has now set you up for Laravel development!
     \/_/
 	EOF
     printf "$RESET"
