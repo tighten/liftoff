@@ -16,19 +16,26 @@ set -e
 BIN=/usr/local/bin
 
 get_os() {
-    OS='macos' # For now
+    OS='macos' # For now. @todo
 }
 
+# https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L52
 command_exists() {
 	command -v "$@" >/dev/null 2>&1
 }
 
 composer_required() {
     # @todo Can we check this?
+    echo ""
 }
 
+# https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L60
+underline() {
+	echo "$(printf '\033[4m')$@$(printf '\033[24m')"
+}
+
+# https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L52
 setup_color() {
-    # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L64
 	# Only use colors if connected to a terminal
 	if [ -t 1 ]; then
 		RED=$(printf '\033[31m')
@@ -50,12 +57,8 @@ setup_color() {
 title() {
     local TITLE=$@
     echo ""
-    echo "${BLUE}${TITLE}${RESET}"
-    local LEN=${#TITLE}
-    local CH='#'
-    printf '%*s' "$LEN" | tr ' ' "$CH"
-    echo ""
-    echo ""
+    echo "${BOLD}${TITLE}${RESET}"
+    echo "============================================================"
 }
 
 setup_php() {
@@ -113,10 +116,15 @@ setup_laravel_installer() {
 setup_takeout() {
     title "Installing Takeout..."
     composer global require tightenco/takeout
+}
 
+instructions() {
+    echo ""
     echo "In order for Takeout to work, you'll want to set up Docker."
     echo "Here are instructions for your system:"
-    echo "https://takeout.tighten.co/install/$OS"
+    echo ""
+    underline "https://takeout.tighten.co/install/$OS"
+    echo ""
 }
 
 main() {
@@ -129,7 +137,24 @@ main() {
     setup_laravel_installer
     setup_takeout
 
-    echo "Paddles is now installed!"
+    echo ""
+    echo "============================================================"
+    echo ""
+    printf "$BLUE"
+	cat <<-'EOF'
+                    __      __   ___
+                   /\ \    /\ \ /\_ \
+ _____      __     \_\ \   \_\ \\//\ \      __    ____
+/\ '__`\  /'__`\   /'_` \  /'_` \ \ \ \   /'__`\ /',__\
+\ \ \L\ \/\ \L\.\_/\ \L\ \/\ \L\ \ \_\ \_/\  __//\__, `\
+ \ \ ,__/\ \__/.\_\ \___,_\ \___,_\/\____\ \____\/\____/
+  \ \ \/  \/__/\/_/\/__,_ /\/__,_ /\/____/\/____/\/___/
+   \ \_\  is now installed!
+    \/_/
+	EOF
+    printf "$RESET"
+
+    instructions
 }
 
 main "$@"
