@@ -2,6 +2,8 @@
 
 Paddles is a simple tool for setting up an ideal Laravel development environment on any machine.
 
+It can be run multiple times on the same machine safely.
+
 ## Getting Started
 
 ### Prerequisites
@@ -12,7 +14,7 @@ Paddles is a simple tool for setting up an ideal Laravel development environment
 
 ### Basic Installation
 
-Paddles is activated by running one of the following commands in your terminal. You can install this via the command-line with either `curl`, `wget` or another similar tool.
+Paddles is activated by running one of the following commands in your terminal.
 
 | Method    | Command                                                                                           |
 |:----------|:--------------------------------------------------------------------------------------------------|
@@ -27,7 +29,8 @@ that by downloading the install script first, looking through it so everything l
 then running it:
 
 ```shell
-wget https://raw.githubusercontent.com/tighten/paddles/main/tools/install.sh
+curl --remote-name https://raw.githubusercontent.com/tighten/paddles/main/tools/install.sh
+less install.sh
 sh install.sh
 ```
 
