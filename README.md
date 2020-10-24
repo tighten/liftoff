@@ -12,7 +12,7 @@ Paddles is a simple tool for setting up an ideal Laravel development environment
 
 ### Basic Installation
 
-Oh My Zsh is installed by running one of the following commands in your terminal. You can install this via the command-line with either `curl`, `wget` or another similar tool.
+Paddles is activated by running one of the following commands in your terminal. You can install this via the command-line with either `curl`, `wget` or another similar tool.
 
 | Method    | Command                                                                                           |
 |:----------|:--------------------------------------------------------------------------------------------------|
@@ -31,9 +31,16 @@ wget https://raw.githubusercontent.com/tighten/paddles/main/tools/install.sh
 sh install.sh
 ```
 
-## Using Paddles
+## What Paddles does for you
 
-Run `paddles go` from anywhere on your command line, and it'll install PHP, Composer, the Laravel Installer, and Takeout..
+Paddles isn't a local installed tool; you run it once and then you're done. 
+
+It'll install:
+
+- PHP
+- Composer
+- The Laravel Installer
+- Takeout (for dependency management)
 
 ## Thanks
 
