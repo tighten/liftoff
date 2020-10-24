@@ -18,9 +18,9 @@ Paddles is activated by running one of the following commands in your terminal.
 
 | Method    | Command                                                                                           |
 |:----------|:--------------------------------------------------------------------------------------------------|
-| **curl**  | `sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/paddles/main/tools/install.sh)"` |
-| **wget**  | `sh -c "$(wget -O- https://raw.githubusercontent.com/tighten/paddles/main/tools/install.sh)"`   |
-| **fetch** | `sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/paddles/main/tools/install.sh)"` |
+| **curl**  | `sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/paddles/main/install.sh)"` |
+| **wget**  | `sh -c "$(wget -O- https://raw.githubusercontent.com/tighten/paddles/main/install.sh)"`   |
+| **fetch** | `sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/paddles/main/install.sh)"` |
 
 #### Manual inspection
 
@@ -29,7 +29,7 @@ that by downloading the install script first, looking through it so everything l
 then running it:
 
 ```shell
-curl --remote-name https://raw.githubusercontent.com/tighten/paddles/main/tools/install.sh
+curl --remote-name https://raw.githubusercontent.com/tighten/paddles/main/install.sh
 less install.sh
 sh install.sh
 ```
