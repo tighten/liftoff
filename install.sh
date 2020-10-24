@@ -150,16 +150,16 @@ instructions() {
 
 logo() {
     echo ""
-    echo ""
     printf "$BLUE"
     cat <<-'EOF'
-    
+
 d888888b d8b   db d888888b d888888b 
   `88'   888o  88   `88'   `~~88~~' 
    88    88V8o 88    88       88    
    88    88 V8o88    88       88    
   .88.   88  V888   .88.      88    
 Y888888P VP   V8P Y888888P    YP    
+
     ... has set you up for Laravel!
 EOF
     printf "$RESET"
