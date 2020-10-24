@@ -1,14 +1,14 @@
 #!/bin/sh
 #
 # This script should be run via curl:
-#   sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/init/main/tools/install.sh)"
+#   sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/liftoff/main/tools/install.sh)"
 # or via wget:
-#   sh -c "$(wget -qO- https://raw.githubusercontent.com/tighten/init/main/tools/install.sh)"
+#   sh -c "$(wget -qO- https://raw.githubusercontent.com/tighten/liftoff/main/tools/install.sh)"
 # or via fetch:
-#   sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/init/main/tools/install.sh)"
+#   sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/liftoff/main/tools/install.sh)"
 #
 # As an alternative, you can first download the install script and run it afterwards:
-#   wget https://raw.githubusercontent.com/tighten/init/main/tools/install.sh
+#   wget https://raw.githubusercontent.com/tighten/liftoff/main/tools/install.sh
 #   sh install.sh
 
 set -e
@@ -109,6 +109,8 @@ define_steps() {
             echo "   PHPEnv already installed; skipping."
         else
             curl -L https://raw.githubusercontent.com/phpenv/phpenv-installer/master/bin/phpenv-installer | bash
+            # @todo Install a version
+            # @todo Get PHP-FPM running?
         fi
     }
 
@@ -169,15 +171,28 @@ define_steps() {
         echo ""
         printf "$BLUE"
         cat <<-'EOF'
-
-          d888888b d8b   db d888888b d888888b 
-            `88'   888o  88   `88'   `~~88~~' 
-             88    88V8o 88    88       88    
-             88    88 V8o88    88       88    
-            .88.   88  V888   .88.      88    
-          Y888888P VP   V8P Y888888P    YP    
-
-                ... has set you up for Laravel!
+                   /\
+                  //\\
+                 //  \\
+                //    \\
+               //______\\
+               |        |
+               |        |
+              /|   /\   |\
+             / |   ||   | \
+            /  |   ||   |  \
+           /  /\   ||   /\  \
+          |__/  \  ||  /  \__|
+            /____\    /____\
+            |    |____|    |
+            |____|/--\|____|
+             \||/ //\\ \||/
+             /##\//##\\/##\
+             \\//\\\///\\// __    _ ______        __________
+              \/\\\\////\/ / /   (_) __/ /_____  / __/ __/ /
+                 \\\///   / /   / / /_/ __/ __ \/ /_/ /_/ / 
+                  \\//   / /___/ / __/ /_/ /_/ / __/ __/_/ 
+                   \/   /_____/_/_/  \__/\____/_/ /_/ (_) 
 EOF
         printf "$RESET"
     }
@@ -209,6 +224,8 @@ main() {
 
     logo
     instructions
+
+    # @todo: Should we prompt them for Valet/Homestead/etc.?
 }
 
 main "$@"
