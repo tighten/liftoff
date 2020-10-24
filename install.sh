@@ -20,18 +20,13 @@ get_os() {
     case "${unameOut}" in
         Linux*)     OS=linux;;
         Darwin*)    OS=macos;;
-        *)          OS="UNKNOWN:${unameOut}"
+        *)          OS="UNKNOWN:${unameOut}" # @todo test this on WSL2; does it report differently than Linux?
     esac
 }
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L52
 command_exists() {
     command -v "$@" >/dev/null 2>&1
-}
-
-composer_required() {
-    # @todo Can we check this?
-    echo ""
 }
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L60
@@ -62,12 +57,12 @@ setup_color() {
 title() {
     local TITLE=$@
     echo ""
-    echo "${BOLD}${TITLE}${RESET}"
+    echo "${GREEN}${TITLE}${RESET}"
     echo "============================================================"
 }
 
 setup_php() {
-    title "Installing PHP..."
+    title "Install PHP"
 
     if command_exists php; then
         echo "We'll rely on your built-in PHP for now."
@@ -79,7 +74,7 @@ setup_php() {
 
 # https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
 setup_composer() {
-    title "Installing Composer..."
+    title "Install Composer"
 
     if command_exists composer; then
         echo "Composer already installed; skipping."
@@ -129,17 +124,18 @@ composer_require() {
         echo "$@ already installed; skipping."
     else
         echo "Installing $@..."
-        composer global require "$@"
+        composer global require "$@" --quiet
+        echo "$@ installed!"
     fi
 }
 
 setup_laravel_installer() {
-    title "Installing the Laravel Installer..."
+    title "Install the Laravel Installer"
     composer_require laravel/installer
 }
 
 setup_takeout() {
-    title "Installing Takeout..."
+    title "Install Takeout"
     composer_require tightenco/takeout
 }
 
@@ -152,20 +148,11 @@ instructions() {
     echo ""
 }
 
-main() {
-    get_os
-
-    setup_color
-
-    setup_php
-    setup_composer
-    setup_laravel_installer
-    setup_takeout
-
+logo() {
     echo ""
     echo ""
     printf "$BLUE"
-	cat <<-'EOF'
+    cat <<-'EOF'
                    ___                                
        ___        /  /\           ___         ___     
       /__/\      /  /::|         /__/\       /__/\    
@@ -178,9 +165,20 @@ main() {
     \__\/         /__/:/       \__\/       \__\/      
                   \__\/
                         ... has set you up for Laravel!
-	EOF
+EOF
     printf "$RESET"
+}
 
+main() {
+    get_os
+    setup_color
+
+    setup_php
+    setup_composer
+    setup_laravel_installer
+    setup_takeout
+
+    logo
     instructions
 }
 
