@@ -1,6 +1,6 @@
-# Paddles -- a quick start for Laravel development in a new environment
+# Init -- a quick start for Laravel development in a new environment
 
-Paddles is a simple tool for setting up an ideal Laravel development environment on any machine.
+Pnit is a simple tool for setting up an ideal Laravel development environment on any machine.
 
 It can be run multiple times on the same machine safely.
 
@@ -14,13 +14,13 @@ It can be run multiple times on the same machine safely.
 
 ### Basic Installation
 
-Paddles is activated by running one of the following commands in your terminal.
+Init is activated by running one of the following commands in your terminal.
 
 | Method    | Command                                                                                           |
 |:----------|:--------------------------------------------------------------------------------------------------|
-| **curl**  | `sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/paddles/main/install.sh)"` |
-| **wget**  | `sh -c "$(wget -O- https://raw.githubusercontent.com/tighten/paddles/main/install.sh)"`   |
-| **fetch** | `sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/paddles/main/install.sh)"` |
+| **curl**  | `sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/init/main/install.sh)"` |
+| **wget**  | `sh -c "$(wget -O- https://raw.githubusercontent.com/tighten/init/main/install.sh)"`   |
+| **fetch** | `sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/init/main/install.sh)"` |
 
 #### Manual inspection
 
@@ -29,21 +29,21 @@ that by downloading the install script first, looking through it so everything l
 then running it:
 
 ```shell
-curl --remote-name https://raw.githubusercontent.com/tighten/paddles/main/install.sh
+curl --remote-name https://raw.githubusercontent.com/tighten/init/main/install.sh
 less install.sh
 sh install.sh
 ```
 
-## What Paddles does for you
+## What Init does for you
 
-Paddles isn't a local installed tool; you run it once and then you're done. 
+Init isn't a locally installed tool; you run it once and then you're done. 
 
 It'll install:
 
 - PHP
-- Composer
+- Composer (for PHP dependencies)
 - The Laravel Installer
-- Takeout (for dependency management)
+- Takeout (for other dependencies like databases)
 
 ## Thanks
 

@@ -1,14 +1,14 @@
 #!/bin/sh
 #
 # This script should be run via curl:
-#   sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/paddles/main/tools/install.sh)"
+#   sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/init/main/tools/install.sh)"
 # or via wget:
-#   sh -c "$(wget -qO- https://raw.githubusercontent.com/tighten/paddles/main/tools/install.sh)"
+#   sh -c "$(wget -qO- https://raw.githubusercontent.com/tighten/init/main/tools/install.sh)"
 # or via fetch:
-#   sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/paddles/main/tools/install.sh)"
+#   sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/init/main/tools/install.sh)"
 #
 # As an alternative, you can first download the install script and run it afterwards:
-#   wget https://raw.githubusercontent.com/tighten/paddles/main/tools/install.sh
+#   wget https://raw.githubusercontent.com/tighten/init/main/tools/install.sh
 #   sh install.sh
 
 set -e
@@ -164,18 +164,20 @@ main() {
 
     echo ""
     echo ""
-    echo ""
     printf "$BLUE"
 	cat <<-'EOF'
-                    __      __   ___
-                   /\ \    /\ \ /\_ \
- _____      __     \_\ \   \_\ \\//\ \      __    ____
-/\ '__`\  /'__`\   /'_` \  /'_` \ \ \ \   /'__`\ /',__\
-\ \ \L\ \/\ \L\.\_/\ \L\ \/\ \L\ \ \_\ \_/\  __//\__, `\
- \ \ ,__/\ \__/.\_\ \___,_\ \___,_\/\____\ \____\/\____/
-  \ \ \/  \/__/\/_/\/__,_ /\/__,_ /\/____/\/____/\/___/
-   \ \_\  has now set you up for Laravel development!
-    \/_/
+                   ___                                
+       ___        /  /\           ___         ___     
+      /__/\      /  /::|         /__/\       /__/\    
+      \__\:\    /  /:|:|         \__\:\      \  \:\   
+      /  /::\  /  /:/|:|__       /  /::\      \__\:\  
+   __/  /:/\/ /__/:/ |:| /\   __/  /:/\/      /  /::\ 
+  /__/\/:/~~  \__\/  |:|/:/  /__/\/:/~~      /  /:/\:\
+  \  \::/         |  |:/:/   \  \::/        /  /:/__\/
+   \  \:\         |__|::/     \  \:\       /__/:/     
+    \__\/         /__/:/       \__\/       \__\/      
+                  \__\/
+                        ... has set you up for Laravel!
 	EOF
     printf "$RESET"
 
