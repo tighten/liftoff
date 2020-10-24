@@ -16,7 +16,12 @@ set -e
 BIN=/usr/local/bin
 
 get_os() {
-    OS='macos' # For now. @todo
+    local unameOut="$(uname -s)"
+    case "${unameOut}" in
+        Linux*)     OS=linux;;
+        Darwin*)    OS=macos;;
+        *)          OS="UNKNOWN:${unameOut}"
+    esac
 }
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L52
