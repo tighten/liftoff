@@ -36,27 +36,27 @@ composer_required() {
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L60
 underline() {
-	echo "$(printf '\033[4m')$@$(printf '\033[24m')"
+    echo "$(printf '\033[4m')$@$(printf '\033[24m')"
 }
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L52
 setup_color() {
-	# Only use colors if connected to a terminal
-	if [ -t 1 ]; then
-		RED=$(printf '\033[31m')
-		GREEN=$(printf '\033[32m')
-		YELLOW=$(printf '\033[33m')
-		BLUE=$(printf '\033[34m')
-		BOLD=$(printf '\033[1m')
-		RESET=$(printf '\033[m')
-	else
-		RED=""
-		GREEN=""
-		YELLOW=""
-		BLUE=""
-		BOLD=""
-		RESET=""
-	fi
+    # Only use colors if connected to a terminal
+    if [ -t 1 ]; then
+        RED=$(printf '\033[31m')
+        GREEN=$(printf '\033[32m')
+        YELLOW=$(printf '\033[33m')
+        BLUE=$(printf '\033[34m')
+        BOLD=$(printf '\033[1m')
+        RESET=$(printf '\033[m')
+    else
+        RED=""
+        GREEN=""
+        YELLOW=""
+        BLUE=""
+        BOLD=""
+        RESET=""
+    fi
 }
 
 title() {
@@ -146,7 +146,7 @@ main() {
     echo "============================================================"
     echo ""
     printf "$BLUE"
-	cat <<-'EOF'
+    cat <<-'EOF'
                     __      __   ___
                    /\ \    /\ \ /\_ \
  _____      __     \_\ \   \_\ \\//\ \      __    ____
@@ -156,7 +156,7 @@ main() {
   \ \ \/  \/__/\/_/\/__,_ /\/__,_ /\/____/\/____/\/___/
    \ \_\  is now installed!
     \/_/
-	EOF
+    EOF
     printf "$RESET"
 
     instructions
