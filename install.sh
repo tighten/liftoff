@@ -27,11 +27,11 @@ define_helpers() {
 
     composer_require() {
         if composer_has_package "$@"; then
-            echo "$@ already installed; skipping."
+            echo "   $@ already installed; skipping."
         else
-            echo "Installing $@..."
+            echo "   Installing $@..."
             composer global require "$@" --quiet
-            echo "$@ installed!"
+            echo "   $@ installed!"
         fi
     }
 
@@ -87,48 +87,58 @@ define_steps() {
     }
 
     install_php() {
-        title "Install PHP"
+        title "1. Install PHP"
 
         if command_exists php; then
             if php_version_is_acceptable; then
-                echo "We'll rely on your built-in PHP for now."
+                echo "   We'll rely on your built-in PHP for now."
             else
-                echo "Sorry, your built-in PHP is too old. We require 7.0 and yours is $(php_version)"
-                exit
+                # echo "Sorry, your built-in PHP is too old. We require 7.0 and yours is $(php_version)"
+                # exit
+                install_phpdotenv
             fi
         else
-            echo "Sorry, only programmed for built-in PHP so far."
-            exit
+            install_phpdotenv
+            # echo "Sorry, only programmed for built-in PHP so far."
+            # exit
+        fi
+    }
+
+    install_phpdotenv() {
+        if command_exists phpenv; then
+            echo "   PHPEnv already installed; skipping."
+        else
+            curl -L https://raw.githubusercontent.com/phpenv/phpenv-installer/master/bin/phpenv-installer | bash
         fi
     }
 
     # https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
     install_composer() {
-        title "install_laravel_installer Composer"
+        title "2. Install Composer"
 
         if command_exists composer; then
-            echo "Composer already installed; skipping."
+            echo "   Composer already installed; skipping."
         else
-            echo "Downloading Composer..."
+            echo "   Downloading Composer..."
             php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 
             if command_exists curl; then
-                echo "Checking validity of the downloaded file..."
+                echo "    Checking validity of the downloaded file..."
 
                 local EXPECTED_CHECKSUM="$(curl -fsSL https://composer.github.io/installer.sig)"
                 local ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', 'composer-setup.php');")"
 
                 if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]
                 then
-                    >&2 echo 'ERROR: Invalid installer checksum from Composer'
+                    >&2 echo "   ERROR: Invalid installer checksum from Composer"
                     rm composer-setup.php
                     exit 1
                 fi
             else
-                echo "Can't check Composer's signature because your machine doesn't have curl."
+                echo "   Can't check Composer's signature because your machine doesn't have curl."
             fi
 
-            echo "Running Composer setup script..."
+            echo "   Running Composer setup script..."
             php composer-setup.php --quiet
             RESULT=$?
             rm composer-setup.php
@@ -137,21 +147,21 @@ define_steps() {
             mv composer.phar $TARGET_PATH
 
             if [ $RESULT ]; then
-                echo "Composer installed!"
+                echo "   Composer installed!"
             else
-                echo "Error installing Composer."
+                echo "   Error installing Composer."
                 exit
             fi
         fi
     }
 
     install_laravel_installer() {
-        title "Install the Laravel Installer"
+        title "3. Install the Laravel Installer"
         composer_require laravel/installer
     }
 
     install_takeout() {
-        title "Install Takeout"
+        title "4. Install Takeout"
         composer_require tightenco/takeout
     }
 
@@ -160,28 +170,28 @@ define_steps() {
         printf "$BLUE"
         cat <<-'EOF'
 
-    d888888b d8b   db d888888b d888888b 
-      `88'   888o  88   `88'   `~~88~~' 
-       88    88V8o 88    88       88    
-       88    88 V8o88    88       88    
-      .88.   88  V888   .88.      88    
-    Y888888P VP   V8P Y888888P    YP    
+          d888888b d8b   db d888888b d888888b 
+            `88'   888o  88   `88'   `~~88~~' 
+             88    88V8o 88    88       88    
+             88    88 V8o88    88       88    
+            .88.   88  V888   .88.      88    
+          Y888888P VP   V8P Y888888P    YP    
 
-        ... has set you up for Laravel!
+                ... has set you up for Laravel!
 EOF
         printf "$RESET"
     }
 
     # @todo: is it possible for us to manually trigger Docker installation on any machines? Assume no?
     instructions() {
+        title "5. Next steps for you"
+        echo "   In order for Takeout to work, you'll need to install Docker."
         echo ""
-        echo "In order for Takeout to work, you'll need to install Docker."
-        echo "Here are instructions for your system:"
+        echo "   Here are instructions for your system:"
+        echo "  " $(underline "https://takeout.tighten.co/install/$OS")
         echo ""
-        underline "https://takeout.tighten.co/install/$OS"
-        echo ""
-        echo "Once you've done that, you can run 'takeout install' to install"
-        echo "dependencies like MySQL."
+        echo "   Once you've done that, you can run 'takeout install' to install"
+        echo "   dependencies like MySQL."
     }
 }
 
