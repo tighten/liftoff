@@ -21,9 +21,26 @@ define_helpers() {
         command -v "$@" >/dev/null 2>&1
     }
 
-    # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L60
-    underline() {
-        echo "$(printf '\033[4m')$@$(printf '\033[24m')"
+    composer_has_package() {
+        composer global show 2>/dev/null | grep "$@" >/dev/null
+    }
+
+    composer_require() {
+        if composer_has_package "$@"; then
+            echo "$@ already installed; skipping."
+        else
+            echo "Installing $@..."
+            composer global require "$@" --quiet
+            echo "$@ installed!"
+        fi
+    }
+
+    php_version() {
+        php -v | grep ^PHP | cut -d' ' -f2
+    }
+
+    php_version_is_acceptable() {
+        php -r 'exit((int)version_compare(PHP_VERSION, "7.0.0", "<"));'
     }
 
     # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L52
@@ -53,18 +70,9 @@ define_helpers() {
         echo "============================================================"
     }
 
-    composer_has_package() {
-        composer global show 2>/dev/null | grep "$@" >/dev/null
-    }
-
-    composer_require() {
-        if composer_has_package "$@"; then
-            echo "$@ already installed; skipping."
-        else
-            echo "Installing $@..."
-            composer global require "$@" --quiet
-            echo "$@ installed!"
-        fi
+    # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L60
+    underline() {
+        echo "$(printf '\033[4m')$@$(printf '\033[24m')"
     }
 }
 
@@ -82,7 +90,12 @@ define_steps() {
         title "Install PHP"
 
         if command_exists php; then
-            echo "We'll rely on your built-in PHP for now."
+            if php_version_is_acceptable; then
+                echo "We'll rely on your built-in PHP for now."
+            else
+                echo "Sorry, your built-in PHP is too old. We require 7.0 and yours is $(php_version)"
+                exit
+            fi
         else
             echo "Sorry, only programmed for built-in PHP so far."
             exit
@@ -159,13 +172,16 @@ EOF
         printf "$RESET"
     }
 
+    # @todo: is it possible for us to manually trigger Docker installation on any machines? Assume no?
     instructions() {
         echo ""
-        echo "In order for Takeout to work, you'll want to set up Docker."
+        echo "In order for Takeout to work, you'll need to install Docker."
         echo "Here are instructions for your system:"
         echo ""
         underline "https://takeout.tighten.co/install/$OS"
         echo ""
+        echo "Once you've done that, you can run 'takeout install' to install"
+        echo "dependencies like MySQL."
     }
 }
 
