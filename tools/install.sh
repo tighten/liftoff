@@ -26,7 +26,7 @@ get_os() {
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L52
 command_exists() {
-	command -v "$@" >/dev/null 2>&1
+    command -v "$@" >/dev/null 2>&1
 }
 
 composer_required() {
