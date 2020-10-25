@@ -167,6 +167,16 @@ define_actions() {
         composer_require tightenco/takeout
     }
 
+    install_docker_if_possible() {
+        DOCKER_INSTALLED=false
+        if [ $OS = 'macos' ]; then
+            echo "   I can't install Docker for you. See notes below."
+        elif [ $OS = 'linux' ]; then
+            echo "   I would love to install it via apt/yum... @todo"
+            DOCKER_INSTALLED=true
+        fi
+    }
+
     prompt_for_other_installations() {
         title "5. (optional) Install other CLI tools"
         echo "   If you'd like, you can also take this moment to install"
@@ -174,12 +184,12 @@ define_actions() {
         echo ""
 
         while true; do
-            read -p "   Would you like to see your options? (Y/n) " SHOULD_INSTALL_OTHERS
-            SHOULD_INSTALL_OTHERS=${SHOULD_INSTALL_OTHERS:-Y}
+            read -p "   Would you like to see your options? (y/N) " SHOULD_INSTALL_OTHERS
+            SHOULD_INSTALL_OTHERS=${SHOULD_INSTALL_OTHERS:-N}
             case $SHOULD_INSTALL_OTHERS in
-                [Yy]* ) SHOULD_INSTALL_OTHERS="Y" && break;;
-                [Nn]* ) break;;
-                * ) echo "   Please answer y or n";;
+                [Yy]*)   SHOULD_INSTALL_OTHERS="Y" && break;;
+                [Nn]*)   break;;
+                *)       echo "   Please answer y or n";;
             esac
         done
 
@@ -187,9 +197,9 @@ define_actions() {
             echo ""
             select INSTALLING in "Valet (test your sites locally)" "Lambo (the Laravel installer, supercharged)" "Done"; do
                 case $INSTALLING in
-                    Valet* ) install_valet;;
-                    Lambo* ) install_lambo;;
-                    Done ) break;;
+                    Valet*)   install_valet;;
+                    Lambo*)   install_lambo;;
+                    Done)     break;;
                 esac
             done
         fi
@@ -228,13 +238,30 @@ EOF
     # @todo: is it possible for us to manually trigger Docker installation on any machines? Assume no?
     instructions() {
         title "6. Next steps for you"
-        echo "   In order for Takeout to work, you'll need to install Docker."
+        if [ $DOCKER_INSTALLED = false ]; then
+            echo "   In order for Takeout to work, you'll need to install Docker."
+            echo ""
+            echo "   Here are instructions for your system:"
+            echo "  " $(underline "https://takeout.tighten.co/install/$OS")
+            echo ""
+            echo "   Once you've done that, you can run 'takeout install' to"
+            echo "   install dependencies like MySQL."
+        else 
+            echo "   You may want to run 'takeout install mysql' to install"
+            echo "   MySQL on your system."
+        fi
         echo ""
-        echo "   Here are instructions for your system:"
-        echo "  " $(underline "https://takeout.tighten.co/install/$OS")
+        echo "   You're now ready to start your first Laravel application!"
+        echo "   Simply navigate to the folder where you'll keep your apps"
+        echo "   and use the Laravel installer:"
         echo ""
-        echo "   Once you've done that, you can run 'takeout install' to"
-        echo "   install dependencies like MySQL."
+        echo "      ${GREEN}cd ~/Sites"
+        echo "      laravel new my-awesome-project${RESET}"
+        echo ""
+        echo "   Finally, to serve this site, simply run 'artisan serve':"
+        echo ""
+        echo "      ${GREEN}cd my-awesome-project"
+        echo "      php artisan serve${RESET}"
     }
 }
 
@@ -260,6 +287,7 @@ main() {
     install_composer
     install_laravel_installer
     install_takeout
+    install_docker_if_possible
 
     prompt_for_other_installations
 
