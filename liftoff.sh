@@ -76,7 +76,7 @@ define_helpers() {
     }
 }
 
-define_steps() {
+define_actions() {
     get_os() {
         local unameOut="$(uname -s)"
         case "${unameOut}" in
@@ -152,7 +152,7 @@ define_steps() {
                 echo "   Composer installed!"
             else
                 echo "   Error installing Composer."
-                exit
+                exit 1
             fi
         fi
     }
@@ -165,6 +165,34 @@ define_steps() {
     install_takeout() {
         title "4. Install Takeout"
         composer_require tightenco/takeout
+    }
+
+    prompt_for_other_installations() {
+        title "5. (optional) Install other CLI tools"
+        echo "   If you'd like, you can also take this moment to install"
+        echo "   other *optional* CLI tools built for Laravel developers."
+        echo ""
+
+        while true; do
+            read -p "   Would you like to see your options? (Y/n) " SHOULD_INSTALL_OTHERS
+            SHOULD_INSTALL_OTHERS=${SHOULD_INSTALL_OTHERS:-Y}
+            case $SHOULD_INSTALL_OTHERS in
+                [Yy]* ) SHOULD_INSTALL_OTHERS="Y" && break;;
+                [Nn]* ) break;;
+                * ) echo "   Please answer y or n";;
+            esac
+        done
+
+        if [ $SHOULD_INSTALL_OTHERS = "Y" ]; then
+            echo ""
+            select INSTALLING in "Valet (test your sites locally)" "Lambo (the Laravel installer, supercharged)" "Done"; do
+                case $INSTALLING in
+                    Valet* ) install_valet;;
+                    Lambo* ) install_lambo;;
+                    Done ) break;;
+                esac
+            done
+        fi
     }
 
     logo() {
@@ -199,20 +227,31 @@ EOF
 
     # @todo: is it possible for us to manually trigger Docker installation on any machines? Assume no?
     instructions() {
-        title "5. Next steps for you"
+        title "6. Next steps for you"
         echo "   In order for Takeout to work, you'll need to install Docker."
         echo ""
         echo "   Here are instructions for your system:"
         echo "  " $(underline "https://takeout.tighten.co/install/$OS")
         echo ""
-        echo "   Once you've done that, you can run 'takeout install' to install"
-        echo "   dependencies like MySQL."
+        echo "   Once you've done that, you can run 'takeout install' to"
+        echo "   install dependencies like MySQL."
+    }
+}
+
+define_other_installers() {
+    install_valet() {
+        composer_require laravel/valet
+    }
+
+    install_lambo() {
+        composer_require tightenco/lambo
     }
 }
 
 main() {
     define_helpers
-    define_steps
+    define_actions
+    define_other_installers
 
     get_os
     setup_color
@@ -222,10 +261,10 @@ main() {
     install_laravel_installer
     install_takeout
 
+    prompt_for_other_installations
+
     logo
     instructions
-
-    # @todo: Should we prompt them for Valet/Homestead/etc.?
 }
 
 main "$@"
