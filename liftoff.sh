@@ -108,6 +108,9 @@ define_actions() {
         if command_exists phpenv; then
             echo "   PHPEnv already installed; skipping."
         else
+            echo "   ... Should we just use apt and homebrew? or apt and something simpler on mac?" # @todo
+            echo "   ... sorry, not sure yet."
+            exit
             curl -L https://raw.githubusercontent.com/phpenv/phpenv-installer/master/bin/phpenv-installer | bash
             # @todo Install a version
             # @todo Get PHP-FPM running?
