@@ -1,14 +1,14 @@
 #!/bin/sh
 #
 # This script should be run via curl:
-#   sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/liftoff/main/tools/install.sh)"
+#   sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/liftoff/main/liftoff.sh)"
 # or via wget:
-#   sh -c "$(wget -qO- https://raw.githubusercontent.com/tighten/liftoff/main/tools/install.sh)"
+#   sh -c "$(wget -qO- https://raw.githubusercontent.com/tighten/liftoff/main/liftoff.sh)"
 # or via fetch:
-#   sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/liftoff/main/tools/install.sh)"
+#   sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/liftoff/main/liftoff.sh)"
 #
 # As an alternative, you can first download the install script and run it afterwards:
-#   wget https://raw.githubusercontent.com/tighten/liftoff/main/tools/install.sh
+#   wget https://raw.githubusercontent.com/tighten/liftoff/main/liftoff.sh
 #   sh install.sh
 
 set -e
@@ -228,9 +228,9 @@ define_actions() {
              /##\//##\\/##\
              \\//\\\///\\// __    _ ______        __________
               \/\\\\////\/ / /   (_) __/ /_____  / __/ __/ /
-                 \\\///   / /   / / /_/ __/ __ \/ /_/ /_/ / 
-                  \\//   / /___/ / __/ /_/ /_/ / __/ __/_/ 
-                   \/   /_____/_/_/  \__/\____/_/ /_/ (_) 
+                 \\\///   / /   / / /_/ __/ __ \/ /_/ /_/ /
+                  \\//   / /___/ / __/ /_/ /_/ / __/ __/_/
+                   \/   /_____/_/_/  \__/\____/_/ /_/ (_)
 EOF
         printf "$RESET"
     }
@@ -246,7 +246,7 @@ EOF
             echo ""
             echo "   Once you've done that, you can run 'takeout install' to"
             echo "   install dependencies like MySQL."
-        else 
+        else
             echo "   You may want to run 'takeout install mysql' to install"
             echo "   MySQL on your system."
         fi
