@@ -1,3 +1,5 @@
+![Liftoff - a quick start for Laravel development in a new environment](liftoff-banner.png?version=1)
+
 # Liftoff -- a quick start for Laravel development in a new environment
 
 Liftoff is a simple tool for setting up an ideal Laravel development environment on any machine.
