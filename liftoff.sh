@@ -93,27 +93,20 @@ define_actions() {
             if php_version_is_acceptable; then
                 echo "   We'll rely on your built-in PHP for now."
             else
-                # echo "Sorry, your built-in PHP is too old. We require 7.0 and yours is $(php_version)"
-                # exit
-                install_phpdotenv
+                install_php_actual
             fi
         else
-            install_phpdotenv
-            # echo "Sorry, only programmed for built-in PHP so far."
-            # exit
+            install_php_actual
         fi
     }
 
-    install_phpdotenv() {
-        if command_exists phpenv; then
-            echo "   PHPEnv already installed; skipping."
+    install_php_actual() {
+        if [ $OS = 'macos' ]; then
+            install_homebrew
+            brew install php
         else
-            echo "   ... Should we just use apt and homebrew? or apt and something simpler on mac?" # @todo
-            echo "   ... sorry, not sure yet."
+            echo "   I think it's gonna be apt for Linux but I gotta get the right syntax here."
             exit
-            curl -L https://raw.githubusercontent.com/phpenv/phpenv-installer/master/bin/phpenv-installer | bash
-            # @todo Install a version
-            # @todo Get PHP-FPM running?
         fi
     }
 
@@ -171,13 +164,19 @@ define_actions() {
     }
 
     install_docker_if_possible() {
-        DOCKER_INSTALLED=false
-        if [ $OS = 'macos' ]; then
-            echo "   I can't install Docker for you. See notes below."
-        elif [ $OS = 'linux' ]; then
-            echo "   I would love to install it via apt/yum... @todo"
+        if command_exists docker; then
             DOCKER_INSTALLED=true
+            echo "   Docker already installed; skipping."
+        else
+            if [ $OS = 'macos' ]; then
+                echo "   I can't install Docker for you. See notes below."
+                DOCKER_INSTALLED=false
+            elif [ $OS = 'linux' ]; then
+                echo "   I would love to install it via apt/yum... @todo"
+                DOCKER_INSTALLED=true
+            fi
         fi
+
     }
 
     prompt_for_other_installations() {
@@ -271,10 +270,18 @@ EOF
 define_other_installers() {
     install_valet() {
         composer_require laravel/valet
+        install_homebrew
     }
 
     install_lambo() {
         composer_require tightenco/lambo
+    }
+
+    install_homebrew() {
+        if ! command_exists brew; then
+            /bin/bash -c $(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)
+        fi
+        # @todo: Should we brew upgrade if it exists?
     }
 }
 
