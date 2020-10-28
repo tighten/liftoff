@@ -113,9 +113,9 @@ define_actions() {
     # https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
     install_composer() {
         title "2. Install Composer"
-        
+
         if [ ! -d "$BIN" ]; then
-            echo "   Creating /usr/local/bin for your. This required your password."
+            echo "   Creating /usr/local/bin; this will require your password."
             sudo mkdir -p $BIN
             sudo chown -R $(whoami) $BIN
         fi
