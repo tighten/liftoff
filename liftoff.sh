@@ -114,6 +114,12 @@ define_actions() {
     install_composer() {
         title "2. Install Composer"
 
+        if [ ! -d "$BIN" ]; then
+            echo "   Creating /usr/local/bin; this will require your password."
+            sudo mkdir -p $BIN
+            sudo chown -R $(whoami) $BIN
+        fi
+
         if command_exists composer; then
             echo "   Composer already installed; skipping."
         else
