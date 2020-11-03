@@ -39,6 +39,26 @@ define_helpers() {
         php -v | grep ^PHP | cut -d' ' -f2
     }
 
+    preferred_shell() {
+        local shellName="$(basename $SHELL)"
+        echo "$shellName" | sed -e 's/-.*//g'
+    }
+
+    shell_profile() {
+        local preferredShell=$(preferred_shell)
+
+        case $preferredShell in
+            bash) echo "$HOME/.bash_profile" ;;
+            zsh) echo "$HOME/.zshrc" ;;
+            sh) echo "$HOME/.profile" ;;
+            *) echo "~/.profile" ;;
+        esac
+    }
+
+    prepend_path_in_profile() {
+        echo "export PATH=\"$@:\$PATH\"" >> $(shell_profile)
+    }
+
     php_version_is_acceptable() {
         php -r 'exit((int)version_compare(PHP_VERSION, "7.0.0", "<"));'
     }
@@ -151,6 +171,9 @@ define_actions() {
             mv composer.phar $TARGET_PATH
 
             if [ $RESULT ]; then
+                local COMPOSER_BIN_PATH="$HOME/.composer/vendor/bin"
+                prepend_path_in_profile $COMPOSER_BIN_PATH
+
                 echo "   Composer installed!"
             else
                 echo "   Error installing Composer."
