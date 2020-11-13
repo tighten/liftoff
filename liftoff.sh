@@ -67,7 +67,7 @@ define_helpers() {
         local TITLE=$@
         echo ""
         echo "${GREEN}${TITLE}${RESET}"
-        echo "============================================================"
+        echo "================================================================"
     }
 
     # https://github.com/ohmyzsh/ohmyzsh/blob/master/tools/install.sh#L60
