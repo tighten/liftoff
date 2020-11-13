@@ -1,3 +1,5 @@
+![Liftoff - a quick start for Laravel development in a new environment](liftoff-banner.png?version=1)
+
 # Liftoff -- a quick start for Laravel development in a new environment
 
 Liftoff is a simple tool for setting up an ideal Laravel development environment on any machine.
@@ -18,9 +20,9 @@ Liftoff is activated by running one of the following commands in your terminal.
 
 | Method    | Command                                                                                           |
 |:----------|:--------------------------------------------------------------------------------------------------|
-| **curl**  | `sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/liftoff/main/install.sh)"` |
-| **wget**  | `sh -c "$(wget -O- https://raw.githubusercontent.com/tighten/liftoff/main/install.sh)"`   |
-| **fetch** | `sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/liftoff/main/install.sh)"` |
+| **curl**  | `sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/liftoff/main/liftoff.sh)"` |
+| **wget**  | `sh -c "$(wget -O- https://raw.githubusercontent.com/tighten/liftoff/main/liftoff.sh)"`   |
+| **fetch** | `sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/liftoff/main/liftoff.sh)"` |
 
 #### Manual inspection
 
@@ -29,9 +31,9 @@ that by downloading the install script first, looking through it so everything l
 then running it:
 
 ```shell
-curl --remote-name https://raw.githubusercontent.com/tighten/liftoff/main/install.sh
-less install.sh
-sh install.sh
+curl --remote-name https://raw.githubusercontent.com/tighten/liftoff/main/liftoff.sh
+less liftoff.sh
+sh liftoff.sh
 ```
 
 ## What Liftoff does for you

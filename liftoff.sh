@@ -1,14 +1,14 @@
 #!/bin/sh
 #
 # This script should be run via curl:
-#   sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/liftoff/main/tools/install.sh)"
+#   sh -c "$(curl -fsSL https://raw.githubusercontent.com/tighten/liftoff/main/liftoff.sh)"
 # or via wget:
-#   sh -c "$(wget -qO- https://raw.githubusercontent.com/tighten/liftoff/main/tools/install.sh)"
+#   sh -c "$(wget -qO- https://raw.githubusercontent.com/tighten/liftoff/main/liftoff.sh)"
 # or via fetch:
-#   sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/liftoff/main/tools/install.sh)"
+#   sh -c "$(fetch -o - https://raw.githubusercontent.com/tighten/liftoff/main/liftoff.sh)"
 #
 # As an alternative, you can first download the install script and run it afterwards:
-#   wget https://raw.githubusercontent.com/tighten/liftoff/main/tools/install.sh
+#   wget https://raw.githubusercontent.com/tighten/liftoff/main/liftoff.sh
 #   sh install.sh
 
 set -e
@@ -37,6 +37,26 @@ define_helpers() {
 
     php_version() {
         php -v | grep ^PHP | cut -d' ' -f2
+    }
+
+    preferred_shell() {
+        local shellName="$(basename $SHELL)"
+        echo "$shellName" | sed -e 's/-.*//g'
+    }
+
+    shell_profile() {
+        local preferredShell=$(preferred_shell)
+
+        case $preferredShell in
+            bash) echo "$HOME/.bash_profile" ;;
+            zsh) echo "$HOME/.zshrc" ;;
+            sh) echo "$HOME/.profile" ;;
+            *) echo "~/.profile" ;;
+        esac
+    }
+
+    prepend_path_in_profile() {
+        echo "export PATH=\"$@:\$PATH\"" >> $(shell_profile)
     }
 
     php_version_is_acceptable() {
@@ -93,30 +113,32 @@ define_actions() {
             if php_version_is_acceptable; then
                 echo "   We'll rely on your built-in PHP for now."
             else
-                # echo "Sorry, your built-in PHP is too old. We require 7.0 and yours is $(php_version)"
-                # exit
-                install_phpdotenv
+                install_php_actual
             fi
         else
-            install_phpdotenv
-            # echo "Sorry, only programmed for built-in PHP so far."
-            # exit
+            install_php_actual
         fi
     }
 
-    install_phpdotenv() {
-        if command_exists phpenv; then
-            echo "   PHPEnv already installed; skipping."
+    install_php_actual() {
+        if [ $OS = 'macos' ]; then
+            install_homebrew
+            brew install php
         else
-            curl -L https://raw.githubusercontent.com/phpenv/phpenv-installer/master/bin/phpenv-installer | bash
-            # @todo Install a version
-            # @todo Get PHP-FPM running?
+            echo "   I think it's gonna be apt for Linux but I gotta get the right syntax here."
+            exit
         fi
     }
 
     # https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
     install_composer() {
         title "2. Install Composer"
+
+        if [ ! -d "$BIN" ]; then
+            echo "   Creating /usr/local/bin; this will require your password."
+            sudo mkdir -p $BIN
+            sudo chown -R $(whoami) $BIN
+        fi
 
         if command_exists composer; then
             echo "   Composer already installed; skipping."
@@ -149,6 +171,9 @@ define_actions() {
             mv composer.phar $TARGET_PATH
 
             if [ $RESULT ]; then
+                local COMPOSER_BIN_PATH="$HOME/.composer/vendor/bin"
+                prepend_path_in_profile $COMPOSER_BIN_PATH
+
                 echo "   Composer installed!"
             else
                 echo "   Error installing Composer."
@@ -168,13 +193,19 @@ define_actions() {
     }
 
     install_docker_if_possible() {
-        DOCKER_INSTALLED=false
-        if [ $OS = 'macos' ]; then
-            echo "   I can't install Docker for you. See notes below."
-        elif [ $OS = 'linux' ]; then
-            echo "   I would love to install it via apt/yum... @todo"
+        if command_exists docker; then
             DOCKER_INSTALLED=true
+            echo "   Docker already installed; skipping."
+        else
+            if [ $OS = 'macos' ]; then
+                echo "   I can't install Docker for you. See notes below."
+                DOCKER_INSTALLED=false
+            elif [ $OS = 'linux' ]; then
+                echo "   I would love to install it via apt/yum... @todo"
+                DOCKER_INSTALLED=true
+            fi
         fi
+
     }
 
     prompt_for_other_installations() {
@@ -228,9 +259,9 @@ define_actions() {
              /##\//##\\/##\
              \\//\\\///\\// __    _ ______        __________
               \/\\\\////\/ / /   (_) __/ /_____  / __/ __/ /
-                 \\\///   / /   / / /_/ __/ __ \/ /_/ /_/ / 
-                  \\//   / /___/ / __/ /_/ /_/ / __/ __/_/ 
-                   \/   /_____/_/_/  \__/\____/_/ /_/ (_) 
+                 \\\///   / /   / / /_/ __/ __ \/ /_/ /_/ /
+                  \\//   / /___/ / __/ /_/ /_/ / __/ __/_/
+                   \/   /_____/_/_/  \__/\____/_/ /_/ (_)
 EOF
         printf "$RESET"
     }
@@ -246,7 +277,7 @@ EOF
             echo ""
             echo "   Once you've done that, you can run 'takeout install' to"
             echo "   install dependencies like MySQL."
-        else 
+        else
             echo "   You may want to run 'takeout install mysql' to install"
             echo "   MySQL on your system."
         fi
@@ -268,10 +299,18 @@ EOF
 define_other_installers() {
     install_valet() {
         composer_require laravel/valet
+        install_homebrew
     }
 
     install_lambo() {
         composer_require tightenco/lambo
+    }
+
+    install_homebrew() {
+        if ! command_exists brew; then
+            /bin/bash -c $(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)
+        fi
+        # @todo: Should we brew upgrade if it exists?
     }
 }
 
